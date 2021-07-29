@@ -2,9 +2,9 @@ _Note_: this repository is no longer maintained as all its features have been ad
 
 # Authentication with JWT, Hasura claims and multiple roles
 
-This is a sample auth JWT service for authenticating requests to the Hasura GraphQL Engine. This also exposes login and signup endpoints. Note that this repository can also be used in webhook mode in using the `/webhook` endpoint. The specifics of this repository is that it maps a `user_role` table to generate `x-hasura-allowed-roles` in the JWT claim so multiple roles can work with the Hasura Grapqh Engine as a backend of the application.
+This is a sample auth JWT service for authenticating requests to the Hasura GraphQL Engine. This also exposes login and register endpoints. Note that this repository can also be used in webhook mode in using the `/webhook` endpoint. The specifics of this repository is that it maps a `user_role` table to generate `x-hasura-allowed-roles` in the JWT claim so multiple roles can work with the Hasura Grapqh Engine as a backend of the application.
 
-The endpoints to manage users are very limited (it is only possible to create a new user through the `/signup` endpoint). This is kind of a choice as this service is meant to be used for authentication only. The user and roles management can be done through the Hasura Graphql Engine or any other service accessing to the same database.
+The endpoints to manage users are very limited (it is only possible to create a new user through the `/register` endpoint). This is kind of a choice as this service is meant to be used for authentication only. The user and roles management can be done through the Hasura Graphql Engine or any other service accessing to the same database.
 
 ## Rationale
 
@@ -120,14 +120,14 @@ More information in the [Hasura documentation](https://docs.hasura.io/1.0/graphq
 
 ## Usage
 
-### Signup
+### register
 
-Once deployed or started locally, we can create an user using `/signup` API like below:
+Once deployed or started locally, we can create an user using `/register` API like below:
 
 ```bash
 curl -H "Content-Type: application/json" \
      -d'{"username": "test123", "password": "test123", "confirmPassword": "test123"}' \
-     http://localhost:8080/signup
+     http://localhost:8080/register
 ```
 
 On success, we get the response:
@@ -151,7 +151,7 @@ curl -H "Content-Type: application/json" \
      http://localhost:8080/login
 ```
 
-It will then send back user information including the JWT in the same format as the above `/signup` endoint.
+It will then send back user information including the JWT in the same format as the above `/register` endoint.
 
 You can use this boilerplate as a webhook server in using the `/webhook` endpoint to fetch a webhook token:
 
