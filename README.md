@@ -120,7 +120,7 @@ More information in the [Hasura documentation](https://docs.hasura.io/1.0/graphq
 
 ## Usage
 
-### register
+### Register
 
 Once deployed or started locally, we can create an user using `/register` API like below:
 
