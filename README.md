@@ -1,5 +1,3 @@
-_Note_: this repository is no longer maintained as all its features have been added to __[Hasura Backend Plus](https://github.com/nhost/hasura-backend-plus)__
-
 # Authentication with JWT, Hasura claims and multiple roles
 
 This is a sample auth JWT service for authenticating requests to the Hasura GraphQL Engine. This also exposes login and register endpoints. Note that this repository can also be used in webhook mode in using the `/webhook` endpoint. The specifics of this repository is that it maps a `user_role` table to generate `x-hasura-allowed-roles` in the JWT claim so multiple roles can work with the Hasura Grapqh Engine as a backend of the application.
@@ -54,7 +52,7 @@ _Note: you can find examples of RSA keys in the repository. **DO NOT USE THEM FO
 
   URL to connect to the Postgres database. The format is . For instance: `DATABASE_URL=postgres://postgres:@localhost:5432/postgres`
 
-- `PORT=8080`
+- `PORT=3335`
 
 The port the server will listen to.
 
@@ -63,7 +61,7 @@ The port the server will listen to.
 First you need to build the image and to tag it:
 
 ```bash
-docker build . -t platyplus/authentication:latest
+docker build . -t hasura/passportjs-jwt-roles:latest
 ```
 
 TODO: document on how to deploy on docker.
@@ -74,10 +72,10 @@ You can also have a look at [this docker-compose gist](https://gist.github.com/p
 
 ```bash
 # Clone the repo
-git clone https://github.com/platyplus/authentication-server
+git clone https://github.com/protob/hasura-jwt-server.git
 
 # Change directory
-cd authentication-server
+cd hasura-jwt-server
 
 # Install NPM dependencies
 npm install
@@ -95,10 +93,35 @@ export DATABASE_URL=postgres://postgres:@localhost:5432/postgres
 # Apply migrations
 # (Note) this step creates tables "users", "roles" and "user_roles" in the database
 knex migrate:latest
+## or use metadata.json and pgdump.sql from hasura migrations folder
+
 
 # Then simply start your app
 npm start
 ```
+
+<!-- ### Deploy with Heroku
+
+TODO: test deployment with heroku, and rewrite this part
+
+```bash
+ # Create heroku app
+ heroku create <app-name>
+
+ # Create PostgreSQL addon
+ heroku addons:create heroku-postgresql:hobby-dev -a <app-name>
+
+ # Add git remote
+ git remote add heroku https://git.heroku.com/<app-name>.git
+
+ # Push changes to heroku
+ # Note: You need to run this command from the toplevel of the working tree (graphql-enginej)
+ git subtree push --prefix community/boilerplates/auth-webhooks/passport-js heroku master
+
+ # Apply migrations
+# (Note) this step creates a "users" table in the database
+ heroku run knex migrate:latest
+``` -->
 
 ### Configure the Hasura GraphQL Engine
 
@@ -116,7 +139,7 @@ You can also configure the server in JWKS mode and set `HASURA_GRAPHQL_JWT_SECRE
 { "type": "RS256", "jwk_url": "hostname:port/jwks" }
 ```
 
-More information in the [Hasura documentation](https://docs.hasura.io/1.0/graphql/manual/auth/jwt.html).
+More information in the [Hasura documentation](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/jwt.html).
 
 ## Usage
 
@@ -127,7 +150,7 @@ Once deployed or started locally, we can create an user using `/register` API li
 ```bash
 curl -H "Content-Type: application/json" \
      -d'{"username": "test123", "password": "test123", "confirmPassword": "test123"}' \
-     http://localhost:8080/register
+     http://localhost:3335/register
 ```
 
 On success, we get the response:
@@ -148,7 +171,7 @@ Let's use the `/login` endpoint to fetch the user information and JWT:
 ```bash
 curl -H "Content-Type: application/json" \
      -d'{"username": "test123", "password": "test123"}' \
-     http://localhost:8080/login
+     http://localhost:3335/login
 ```
 
 It will then send back user information including the JWT in the same format as the above `/register` endoint.
@@ -158,18 +181,22 @@ You can use this boilerplate as a webhook server in using the `/webhook` endpoin
 ```bash
 curl -H "Content-Type: application/json" \
      -d'{"username": "test123", "password": "test123"}' \
-     http://localhost:8080/login
+     http://localhost:3335/login
 ```
 
 ## Limitations
 
-- Not tested with Heroku
-- There is no user and role management except to create a single user with no specific role. I myself do this part with a frontend app that access the database through a Hasura GraphQL endpoint.
-- The JWKS endpoint `/jwks` is not working, I could not find a way to format the modulus (n) part of the JWK that is read by the Hasura graphql-engine without error. A contribution would be much appreciated!
+- There is no user and role management except to create a single user with no specific role. It can be done frontend app that access the database through a Hasura GraphQL endpoint.
 - This server is designed to work with one RSA key only, and does not handle its regular rotation.
 - No handling of JWT expiration and key turnover.
-- This server is not (yet?) designed to handle authentication through other services such as Google, Github... It would be nice to do so, but to keep this server as a proxy that would add the Hasura claims in querying the database about the roles of the user. Comments or any contribution are welcome as well on this one.
+- This server is not (yet?) designed to handle authentication through other services such as Google, GitHub... It would be nice to do so, but to keep this server as a proxy that would add the Hasura claims in querying the database about the roles of the user. Comments or any contribution are welcome as well on this one.
 - No automated tests.
 - another cool feature to be would be to expose the endpoints through hasura remote schema, and not directly to the client
 
-Contributions are welcome!
+## Credits
+
+Taken from hasura community repository boilerplate [here](https://github.com/hasura/graphql-engine/tree/master/community/boilerplates/auth-servers/passportjs-jwt-roles).
+
+The original repository can be found [here](https://github.com/platyplus/authentication-server).
+
+This repository is inspired from the original [auth-webhooks/passport-js repo](https://github.com/hasura/graphql-engine/tree/master/community/boilerplates/auth-webhooks/passport-js).

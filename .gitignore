@@ -13,5 +13,5 @@ yarn-error.log*
 *.njsproj
 *.sln
 
-private.pem
-public.pem
+#private.pem
+#public.pem
